@@ -1,8 +1,9 @@
 var state = [];
 
 function setTabState(tabState) {
-  // Only inject CSS if not previously done
-  if(state[tabState.tabId] === undefined) {
+  // Inject CSS to match the active state. Keeps things consistent when
+  // browsing in active mode.
+  if(tabState.active) {
     chrome.tabs.insertCSS({file: 'style.css'})
   }
 

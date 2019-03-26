@@ -1,7 +1,7 @@
 {
   "name": "Lyf",
   "description": "Keep reading. Links can wait.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
