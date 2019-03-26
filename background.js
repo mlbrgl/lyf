@@ -1,7 +1,12 @@
 var state = [];
 
 function setTabState(tabState) {
-  console.log('set state', state)
+  // Only inject CSS if not previously done
+  if(state[tabState.tabId] === undefined) {
+    chrome.tabs.insertCSS({file: 'style.css'})
+  }
+
+  // Toggle body class and icon
   action = tabState.active ? 'add' : 'remove';
   chrome.tabs.executeScript({
     code: "document.querySelector('body').classList." + action + "('lyf-d205f28767a5');"
