@@ -1,38 +1,29 @@
-function activate() {
+var state = [];
+
+function setTabState(tabState) {
+  console.log('set state', state)
+  action = tabState.active ? 'add' : 'remove';
   chrome.tabs.executeScript({
-    code: "document.querySelector('body').classList.toggle('lyf-d205f28767a5');"
+    code: "document.querySelector('body').classList." + action + "('lyf-d205f28767a5');"
   }, function (){
-    chrome.tabs.insertCSS({
-      file: 'style.css'
-    });
-    chrome.storage.local.set({active: true});
-    chrome.browserAction.setIcon({path: 'icons/icon16.png'})
+    icon = tabState.active ? 'icon16' : 'icon16_inactive';
+    chrome.browserAction.setIcon({path: 'icons/' + icon + '.png', tabId: tabState.tabId})
+
+    // Commit state
+    state[tabState.tabId] = tabState.active;
   });
 }
 
-function deactivate() {
-  chrome.tabs.executeScript({
-    code: "document.querySelector('body').classList.toggle('lyf-d205f28767a5');"
-  }, function (){
-    chrome.storage.local.set({active: false});
-    chrome.browserAction.setIcon({path: 'icons/icon16_inactive.png'});
-  });
-}
-
-chrome.webNavigation.onCompleted.addListener(function (details){
-  chrome.storage.local.get(['active'], function(result){
-    if(result.active) {
-      activate()
-    }
-  });
+chrome.webNavigation.onDOMContentLoaded.addListener(function (details){
+  if(details.frameId === 0 && state[details.tabId]) {
+    setTabState({tabId: details.tabId, active: true});
+  }
 });
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-  chrome.storage.local.get(['active'], function(result){
-    if(!result.active) {
-      activate();
-    } else {
-      deactivate();
-    }
-  });
-})
+  if(!state[tab.id]) {
+    setTabState({tabId: tab.id, active: true});
+  } else {
+    setTabState({tabId: tab.id, active: false});
+  }
+});
